@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+</head>
+<body>
+
+<canvas id="pdf"></canvas>
+
+<script>
+const socket = io();
+const canvas = document.getElementById("pdf");
+const ctx = canvas.getContext("2d");
+
+let pdf, page = 1;
+
+pdfjsLib.getDocument("/static/sample.pdf").promise.then(p => {
+  pdf = p;
+  render();
+});
+
+function render() {
+  pdf.getPage(page).then(pg => {
+    const v = pg.getViewport({ scale: 1.5 });
+    canvas.width = v.width;
+    canvas.height = v.height;
+    pg.render({ canvasContext: ctx, viewport: v });
+  });
+}
+
+socket.on("touch", e => {
+  if (e.type === "move") {
+    window.scrollBy(0, -e.dy);
+  }
+});
+</script>
+
+</body>
+</html>

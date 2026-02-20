@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projector Display - Optical Touch System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+</head>
+<body class="projector-body">
+    <div class="projector-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-sliders-h"></i> Controls</h2>
+            </div>
+
+            <div class="sidebar-section">
+                <h3><i class="fas fa-paint-brush"></i> Drawing Tools</h3>
+                <div class="tool-buttons">
+                    <button class="tool-btn active" data-tool="pen">
+                        <i class="fas fa-pen"></i> Pen
+                    </button>
+                    <button class="tool-btn" data-tool="eraser">
+                        <i class="fas fa-eraser"></i> Eraser
+                    </button>
+                    <button class="tool-btn" data-tool="line">
+                        <i class="fas fa-minus"></i> Line
+                    </button>
+                    <button class="tool-btn" data-tool="rectangle">
+                        <i class="fas fa-square"></i> Rectangle
+                    </button>
+                    <button class="tool-btn" data-tool="circle">
+                        <i class="fas fa-circle"></i> Circle
+                    </button>
+                    <button class="tool-btn" data-tool="text">
+                        <i class="fas fa-font"></i> Text
+                    </button>
+                </div>
+
+                <div class="color-picker">
+                    <h4>Color</h4>
+                    <div class="color-options">
+                        <div class="color-option" style="background-color: #000000;" data-color="#000000"></div>
+                        <div class="color-option" style="background-color: #ff0000;" data-color="#ff0000"></div>
+                        <div class="color-option" style="background-color: #00ff00;" data-color="#00ff00"></div>
+                        <div class="color-option" style="background-color: #0000ff;" data-color="#0000ff"></div>
+                        <div class="color-option" style="background-color: #ffff00;" data-color="#ffff00"></div>
+                        <div class="color-option" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
+                        <div class="color-option" style="background-color: #ffffff;" data-color="#ffffff"></div>
+                    </div>
+                    <input type="color" id="customColor" value="#000000">
+                </div>
+
+                <div class="brush-size">
+                    <h4>Brush Size</h4>
+                    <input type="range" id="brushSize" min="1" max="50" value="5">
+                    <span id="brushSizeValue">5px</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3><i class="fas fa-file-import"></i> Documents</h3>
+                <div class="document-controls">
+                    <button id="uploadPdf" class="btn btn-secondary">
+                        <i class="fas fa-file-pdf"></i> Upload PDF
+                    </button>
+                    <button id="uploadPresentation" class="btn btn-secondary">
+                        <i class="fas fa-file-powerpoint"></i> Upload Presentation
+                    </button>
+                    <input type="file" id="fileInput" accept=".pdf,.ppt,.pptx,.png,.jpg,.jpeg" style="display: none;">
+                    
+                    <div class="document-list" id="documentList">
+                        <p>No documents loaded</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3><i class="fas fa-tools"></i> Canvas Controls</h3>
+                <div class="canvas-controls">
+                    <button id="clearCanvas" class="btn btn-warning">
+                        <i class="fas fa-trash"></i> Clear Canvas
+                    </button>
+                    <button id="undo" class="btn btn-outline">
+                        <i class="fas fa-undo"></i> Undo
+                    </button>
+                    <button id="redo" class="btn btn-outline">
+                        <i class="fas fa-redo"></i> Redo
+                    </button>
+                    <button id="saveCanvas" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save as Image
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3><i class="fas fa-info-circle"></i> Touch Info</h3>
+                <div class="touch-info">
+                    <p>Active Touches: <span id="activeTouches">0</span></p>
+                    <div id="touchPositions">
+                        No touches detected
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-canvas">
+            <header class="canvas-header">
+                <h1><i class="fas fa-chalkboard"></i> Interactive Whiteboard</h1>
+                <div class="connection-info">
+                    <span class="status-dot connected"></span>
+                    <span>Connected</span>
+                    <button id="fullscreenBtn" class="btn btn-outline">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                </div>
+            </header>
+
+            <div class="canvas-container">
+                <canvas id="mainCanvas"></canvas>
+                <div class="touch-indicators" id="touchIndicators"></div>
+                
+                <!-- PDF Viewer Overlay -->
+                <div id="pdfViewer" class="pdf-viewer">
+                    <div class="pdf-controls">
+                        <button id="closePdf" class="btn btn-warning">
+                            <i class="fas fa-times"></i> Close PDF
+                        </button>
+                        <button id="prevPage" class="btn btn-outline">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <span id="pageInfo">Page 1 of 1</span>
+                        <button id="nextPage" class="btn btn-outline">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <canvas id="pdfCanvas"></canvas>
+                </div>
+
+                <!-- Presentation Viewer -->
+                <div id="presentationViewer" class="presentation-viewer">
+                    <div class="slide-controls">
+                        <button id="closePresentation" class="btn btn-warning">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                        <button id="prevSlide" class="btn btn-outline">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <span id="slideInfo">Slide 1 of 1</span>
+                        <button id="nextSlide" class="btn btn-outline">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <img id="slideImage" src="" alt="Presentation Slide">
+                </div>
+            </div>
+
+            <footer class="canvas-footer">
+                <p>Use touch gestures to draw and interact | Pinch to zoom | Two-finger drag to pan</p>
+            </footer>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/projector.js') }}"></script>
+</body>
+</html>

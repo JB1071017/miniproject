@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Touch Demo</title>
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            overflow: hidden;
+        }
+        #popup {
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #00ff88;
+            padding: 30px 60px;
+            font-size: 40px;
+            border-radius: 15px;
+            display: none;
+            font-family: Arial;
+        }
+        #dot {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: red;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="popup">TOUCH DETECTED</div>
+<div id="dot"></div>
+
+<script>
+setInterval(() => {
+    fetch("/touch_status")
+        .then(r => r.json())
+        .then(d => {
+            const p = document.getElementById("popup");
+            const dot = document.getElementById("dot");
+
+            if (d.touch && d.point) {
+                p.style.display = "block";
+                dot.style.display = "block";
+                dot.style.left = d.point[0] + "px";
+                dot.style.top  = d.point[1] + "px";
+            } else {
+                p.style.display = "none";
+                dot.style.display = "none";
+            }
+        });
+}, 50);
+</script>
+
+</body>
+</html>

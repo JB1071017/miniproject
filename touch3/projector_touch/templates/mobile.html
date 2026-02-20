@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<video id="video" autoplay playsinline></video>
+<canvas id="preview" width="160" height="120"
+style="position:fixed;bottom:10px;left:10px;border:2px solid red;"></canvas>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+const video = document.getElementById("video");
+const canvas = document.getElementById("preview");
+const ctx = canvas.getContext("2d");
+const socket = io();
+
+navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+.then(s => video.srcObject = s);
+
+setInterval(() => {
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  socket.emit("frame", canvas.toDataURL("image/jpeg"));
+}, 100);
+</script>
+
+</body>
+</html>

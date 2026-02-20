@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>💻 Desktop Viewer</h2>
+<video id="remote" autoplay playsinline muted></video>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+const room = "{{ room }}";
+const socket = io();
+
+const pc = new RTCPeerConnection({
+  iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+});
+
+// 🔒 RECEIVE ONLY
+pc.addTransceiver("video", { direction: "recvonly" });
+
+socket.emit("join", { room });
+
+pc.ontrack = e => {
+  document.getElementById("remote").srcObject = e.streams[0];
+};
+
+pc.onicecandidate = e => {
+  if (e.candidate)
+    socket.emit("ice", { room, candidate: e.candidate });
+};
+
+socket.on("offer", async d => {
+  await pc.setRemoteDescription(d.offer);
+  const answer = await pc.createAnswer();
+  await pc.setLocalDescription(answer);
+  socket.emit("answer", { room, answer });
+});
+
+socket.on("ice", d => pc.addIceCandidate(d.candidate));
+</script>
+</body>
+</html>

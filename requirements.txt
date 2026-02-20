@@ -1,0 +1,12 @@
+Flask
+Flask-SocketIO
+flask-cors
+eventlet
+opencv-python
+mediapipe
+numpy
+Pillow
+PyMuPDF
+pyautogui
+pynput
+python-dotenv

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optical Touch System - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-hand-pointer"></i> Optical Touch System</h1>
+            <p class="subtitle">Transform any surface into a touch interface using your mobile camera</p>
+        </header>
+
+        <main class="main-content">
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h2>Mobile Camera</h2>
+                <p>Use your mobile device as a camera sensor to detect touch interactions.</p>
+                <a href="/mobile" class="btn btn-primary">
+                    <i class="fas fa-camera"></i> Open Mobile Interface
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-desktop"></i>
+                </div>
+                <h2>Projector Display</h2>
+                <p>Display the interactive whiteboard on a projector or large screen.</p>
+                <a href="/projector" class="btn btn-secondary">
+                    <i class="fas fa-expand"></i> Open Projector View
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h2>How It Works</h2>
+                <ol class="instructions">
+                    <li>Open the projector view on your computer/projector</li>
+                    <li>Open the mobile interface on your phone</li>
+                    <li>Point phone camera at the projected surface</li>
+                    <li>Calibrate by tapping 4 corners when prompted</li>
+                    <li>Start interacting with touch!</li>
+                </ol>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Optical Touch Detection System &copy; 2024 | Computer Vision Based Interface</p>
+        </footer>
+    </div>
+</body>
+</html>

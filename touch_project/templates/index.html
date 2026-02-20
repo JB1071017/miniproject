@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Optical Touch Board</title>
+    <style>
+        body {
+            margin: 0;
+            background: white;
+            overflow: hidden;
+        }
+        #dot {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: red;
+            border-radius: 50%;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="dot"></div>
+
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+<script>
+const socket = io();
+const dot = document.getElementById("dot");
+
+socket.on("touch", data => {
+    dot.style.display = "block";
+    dot.style.left = (data.x * window.innerWidth) + "px";
+    dot.style.top  = (data.y * window.innerHeight) + "px";
+});
+</script>
+
+</body>
+</html>

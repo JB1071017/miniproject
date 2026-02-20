@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Finger Controlled PDF</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  text-align: center;
+}
+canvas {
+  border: 1px solid #ccc;
+}
+video, #camCanvas {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Finger Controlled PDF</h2>
+<canvas id="pdfCanvas"></canvas>
+
+<video id="video" autoplay playsinline></video>
+<canvas id="camCanvas" width="320" height="240"></canvas>
+
+<script>
+const video = document.getElementById("video");
+const camCanvas = document.getElementById("camCanvas");
+const camCtx = camCanvas.getContext("2d");
+
+// CAMERA ACCESS (HTTPS REQUIRED)
+navigator.mediaDevices.getUserMedia({ video: true })
+  .then(stream => video.srcObject = stream)
+  .catch(err => alert("Camera error: " + err));
+
+// SEND FRAMES TO BACKEND
+async function sendFrame() {
+  camCtx.drawImage(video, 0, 0, camCanvas.width, camCanvas.height);
+  const dataURL = camCanvas.toDataURL("image/jpeg");
+
+  const res = await fetch("/detect", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ image: dataURL })
+  });
+
+  const json = await res.json();
+
+  if (json.scroll === "down") nextPage();
+  if (json.scroll === "up") prevPage();
+}
+
+setInterval(sendFrame, 300);
+</script>
+
+<script>
+// PDF VIEWER
+let pdfDoc = null;
+let pageNum = 1;
+
+const canvas = document.getElementById("pdfCanvas");
+const ctx = canvas.getContext("2d");
+
+pdfjsLib.getDocument("/static/sample.pdf").promise.then(pdf => {
+  pdfDoc = pdf;
+  renderPage();
+});
+
+function renderPage() {
+  pdfDoc.getPage(pageNum).then(page => {
+    const viewport = page.getViewport({ scale: 1.2 });
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    page.render({ canvasContext: ctx, viewport });
+  });
+}
+
+function nextPage() {
+  if (pageNum < pdfDoc.numPages) {
+    pageNum++;
+    renderPage();
+  }
+}
+
+function prevPage() {
+  if (pageNum > 1) {
+    pageNum--;
+    renderPage();
+  }
+}
+</script>
+
+</body>
+</html>

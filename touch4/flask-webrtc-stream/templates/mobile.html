@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2>📱 Mobile Camera</h2>
+<video id="local" autoplay playsinline muted></video>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+const room = "{{ room }}";
+const socket = io();
+
+const pc = new RTCPeerConnection({
+  iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+});
+
+socket.emit("join", { room });
+
+pc.onicecandidate = e => {
+  if (e.candidate)
+    socket.emit("ice", { room, candidate: e.candidate });
+};
+
+// 🔥 THIS IS THE FIX
+pc.onnegotiationneeded = async () => {
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  socket.emit("offer", { room, offer });
+};
+
+socket.on("answer", d => pc.setRemoteDescription(d.answer));
+socket.on("ice", d => pc.addIceCandidate(d.candidate));
+
+navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+.then(stream => {
+  document.getElementById("local").srcObject = stream;
+  stream.getTracks().forEach(t => pc.addTrack(t, stream));
+});
+</script>
+</body>
+</html>

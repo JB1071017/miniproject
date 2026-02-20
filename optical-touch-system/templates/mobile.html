@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Camera - Optical Touch System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body class="mobile-body">
+    <div class="mobile-container">
+        <header class="mobile-header">
+            <h1><i class="fas fa-camera"></i> Camera Sensor</h1>
+            <div class="connection-status">
+                <span id="statusDot" class="status-dot disconnected"></span>
+                <span id="statusText">Disconnected</span>
+            </div>
+        </header>
+
+        <main class="mobile-main">
+            <div class="video-container">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas" style="display:none;"></canvas>
+                <div class="video-overlay" id="calibrationOverlay">
+                    <div class="calibration-instruction">
+                        <h3>Calibration Step <span id="calStep">1</span>/4</h3>
+                        <p>Tap the <span id="cornerName">top-left</span> corner of the projected area</p>
+                        <button id="calibrateBtn" class="btn btn-primary">
+                            <i class="fas fa-crosshairs"></i> Calibrate This Corner
+                        </button>
+                        <button id="startCalibration" class="btn btn-secondary">
+                            <i class="fas fa-play"></i> Start Calibration
+                        </button>
+                        <button id="skipCalibration" class="btn btn-outline">
+                            <i class="fas fa-forward"></i> Skip Calibration
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <button id="toggleCamera" class="btn-control">
+                        <i class="fas fa-sync-alt"></i> Switch Camera
+                    </button>
+                    <button id="toggleStream" class="btn-control">
+                        <i class="fas fa-play"></i> Start Stream
+                    </button>
+                    <button id="calibrationToggle" class="btn-control">
+                        <i class="fas fa-ruler-combined"></i> Recalibrate
+                    </button>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <i class="fas fa-touchpad"></i>
+                        <span>Touches: <span id="touchCount">0</span></span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-signal"></i>
+                        <span>FPS: <span id="fpsCounter">0</span></span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-microchip"></i>
+                        <span>Status: <span id="processingStatus">Idle</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-panel">
+                <h3><i class="fas fa-sliders-h"></i> Detection Settings</h3>
+                <div class="slider-container">
+                    <label for="sensitivity">Sensitivity</label>
+                    <input type="range" id="sensitivity" min="10" max="100" value="30">
+                    <span id="sensitivityValue">30</span>
+                </div>
+                <div class="slider-container">
+                    <label for="threshold">Motion Threshold</label>
+                    <input type="range" id="threshold" min="5" max="50" value="25">
+                    <span id="thresholdValue">25</span>
+                </div>
+                <button id="resetBackground" class="btn btn-outline">
+                    <i class="fas fa-redo"></i> Reset Background
+                </button>
+            </div>
+        </main>
+
+        <footer class="mobile-footer">
+            <p>Point camera at projected surface | Ensure good lighting | Keep steady</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/mobile.js') }}"></script>
+</body>
+</html>
