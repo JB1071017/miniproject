@@ -5,7 +5,7 @@ from pynput.mouse import Button, Controller
 import time
 
 #cap = cv2.VideoCapture(0)
-cap = cv2.VideoCapture("http://192.168.137.119:4747/video")
+cap = cv2.VideoCapture("http://192.168.137.244:4747/video")
 time.sleep(1.1)
 _,img = cap.read()
 alpha = 2
